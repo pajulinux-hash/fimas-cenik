@@ -28,6 +28,21 @@ html,body{height:100%;background:var(--ink-3);color:#fff;font-family:var(--body)
 
 /* SMYČKA */
 #loop{position:fixed;inset:10vh 0 0 0}
+body.msg #loop, body.msg #portal{top:16vh}
+#ticker{position:fixed;top:10vh;left:0;right:0;height:6vh;display:none;align-items:center;gap:1.6vw;padding:0 3.5vw;background:var(--accent);color:var(--ink-3);z-index:6;font:700 3vh var(--head);text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden}
+body.msg #ticker{display:flex}
+#ticker b{background:var(--ink-3);color:var(--accent);padding:.4vh 1.2vh;border-radius:.6vh;font-size:2.2vh;letter-spacing:.1em}
+#ticker span{overflow:hidden;text-overflow:ellipsis}
+body.msg.urgent #ticker{background:#c0392b;color:#fff;animation:pulse 2.5s infinite}
+body.msg.urgent #ticker b{background:#fff;color:#c0392b}
+.slide.msgslide{background:radial-gradient(circle at 80% 40%,var(--ink-2),var(--ink-3) 70%);display:flex;align-items:center;padding:0 7vw;gap:5vw}
+.msgslide .ico{flex:none;width:30vh;height:30vh;border-radius:50%;background:var(--accent);color:var(--ink-3);display:flex;align-items:center;justify-content:center;font:800 22vh/1 var(--head)}
+.msgslide.urgent .ico{background:#c0392b;color:#fff}
+.msgslide .kicker{font-size:3.4vh}
+.msgslide.urgent .kicker{color:#ff8a7a}
+.msgslide .title{font-size:9vh;margin-bottom:3vh}
+.msgslide .lead{font-size:3.6vh;max-width:none;white-space:pre-line}
+.msgslide .until{margin-top:3vh;font:700 3vh var(--head);color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
 .slide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease}
 .slide.on{opacity:1}
 .photo{position:absolute;top:0;right:0;bottom:0;width:58%;background-size:cover;background-position:center;transform:scale(1.06);transition:transform 14s linear}
@@ -123,6 +138,7 @@ html,body{height:100%;background:var(--ink-3);color:#fff;font-family:var(--body)
   <div id="clock"><span id="time">--:--</span><small id="date"></small></div>
 </div>
 
+<div id="ticker"><b id="tickerk">Informace</b><span id="tickert"></span></div>
 <div id="loop"></div>
 <div id="dots"></div>
 <div id="hint">👆 Dotkněte se obrazovky – e-shop a katalogy dílů</div>
@@ -150,6 +166,8 @@ const CONFIG = {
   portalIdleSeconds: 90,   // návrat z rozcestníku po nečinnosti
   reloadAt: "03:00",       // denní obnovení stránky
   cenikUrl: "https://pajulinux-hash.github.io/fimas-cenik/",
+  hlaseniUrl: "https://pajulinux-hash.github.io/fimas-cenik/sklad/hlaseni.txt",  // hlášení na monitor
+  hlaseniMinutes: 2,       // jak často kontrolovat nové hlášení
   cenikPin: "1994",        // PIN k ceníku a složkám s katalogy ("" = bez PINu) – ZMĚŇTE
   pinMinutes: 10,          // po zadání PINu není potřeba ho znovu zadávat (min)
   katalogy: "file:///C:/FIMAS/katalogy/",   // složky s PDF katalogy na mini PC (Windows)
@@ -264,13 +282,57 @@ window.addEventListener("load", () => document.querySelectorAll(".qr").forEach(b
 
 let cur=-1, timer=null, start=0, mode="loop";
 const slides=[...loop.children], dotEls=[...dots.children];
+/* snímek s hlášením – zařadí se na začátek smyčky, důležité hlášení po každých 3 snímcích */
+const msgEl=document.createElement("section"); msgEl.className="slide msgslide"; loop.appendChild(msgEl);
+let msg=null, seq=[...slides];
+function buildSeq(){
+  seq=[]; slides.forEach((s,i)=>{ if(msg && (i===0 || (msg.urgent && i%3===0))) seq.push(msgEl); seq.push(s); });
+}
 function show(i){
-  cur=(i+slides.length)%slides.length;
-  slides.forEach((s,k)=>s.classList.toggle("on",k===cur));
-  dotEls.forEach((d,k)=>d.classList.toggle("on",k===cur));
+  cur=(i+seq.length)%seq.length; const el=seq[cur];
+  [...slides,msgEl].forEach(s=>s.classList.toggle("on",s===el));
+  dotEls.forEach((d,k)=>d.classList.toggle("on",slides[k]===el));
   start=performance.now(); clearTimeout(timer);
   timer=setTimeout(()=>show(cur+1),CONFIG.slideSeconds*1000);
 }
+
+/* HLÁŠENÍ: soubor hlaseni.txt na GitHubu
+   1. řádek = nadpis, další řádky = text, "platí do: 16.11.2026", "důležité: ano"; řádky s # se ignorují; prázdný soubor = nic */
+function parseMsg(txt){
+  const lines=txt.split(/\r?\n/).map(l=>l.trim()).filter(l=>l && !l.startsWith("#"));
+  if(!lines.length) return null;
+  let until=null, urgent=false; const body=[];
+  for(const l of lines.slice(1)){
+    let m;
+    if(m=l.match(/^plat[ií] do:\s*(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/i)) until=new Date(+m[3],+m[2]-1,+m[1],23,59,59);
+    else if(/^d[uů]le[zž]it[eé]:\s*(ano|a|yes|1)/i.test(l)) urgent=true;
+    else body.push(l);
+  }
+  if(until && new Date()>until) return null;   // platnost vypršela
+  return {title:lines[0], text:body.join("\n"), until, urgent};
+}
+function applyMsg(m){
+  const key=JSON.stringify(m); if(key===applyMsg.last) return; applyMsg.last=key;
+  msg=m;
+  document.body.classList.toggle("msg",!!m); document.body.classList.toggle("urgent",!!(m&&m.urgent));
+  if(m){
+    $("#tickerk").textContent=m.urgent?"Důležité":"Informace";
+    $("#tickert").textContent=m.title;
+    msgEl.classList.toggle("urgent",m.urgent);
+    const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+    msgEl.innerHTML=`<div class="ico">!</div><div><div class="kicker">${m.urgent?"Důležité upozornění":"Informace"}</div>
+      <div class="title">${esc(m.title)}</div>${m.text?`<p class="lead">${esc(m.text)}</p>`:""}
+      ${m.until?`<div class="until">Platí do ${m.until.getDate()}. ${m.until.getMonth()+1}. ${m.until.getFullYear()}</div>`:""}</div>`;
+  }
+  buildSeq(); if(mode==="loop") show(0);
+}
+async function loadMsg(){
+  try{
+    const r=await fetch(CONFIG.hlaseniUrl+"?t="+Date.now(),{cache:"no-store"});
+    if(r.ok) applyMsg(parseMsg(await r.text())); else if(r.status===404) applyMsg(null);
+  }catch(e){ if(msg && msg.until && new Date()>msg.until) applyMsg(null); }   // offline: nechá poslední hlášení
+}
+loadMsg(); setInterval(loadMsg,CONFIG.hlaseniMinutes*60000);
 (function progress(){ if(mode==="loop") $("#prog").style.width=Math.min(100,(performance.now()-start)/(CONFIG.slideSeconds*10))+"%"; requestAnimationFrame(progress); })();
 show(0);
 

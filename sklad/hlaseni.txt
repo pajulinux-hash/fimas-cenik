@@ -1,0 +1,14 @@
+# HLÁŠENÍ NA MONITOR VE SKLADU
+# Řádky začínající # se nezobrazují. Když pod nimi nic není, monitor žádné hlášení neukazuje.
+#
+# Jak napsat hlášení (smažte # na začátku řádků):
+#   1. řádek  = nadpis (zobrazí se i v pruhu nahoře)
+#   další řádky = podrobnější text (nepovinné)
+#   platí do: 16.11.2026   = po tomto dni hlášení samo zmizí (nepovinné, doporučeno)
+#   důležité: ano          = červený pruh a hlášení častěji ve smyčce (nepovinné)
+#
+# Příklad:
+# Uzavření prodejny a pneuservisu v pondělí 16. 11. 2026
+# Z technických důvodů budou prodejna i pneuservis zavřené.
+# platí do: 16.11.2026
+# důležité: ano
