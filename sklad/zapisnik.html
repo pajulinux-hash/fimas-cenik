@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>FIMAS – Zápisník požadavků</title>
+<title>FIMAS SkladNote – požadavky zákazníků</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#1f3d23;--ink2:#2b5230;--ink3:#16301a;--brand:#4f8a52;--brandlt:#e9f2e6;--accent:#ecb736;--steel:#5b6470;--paper:#f5f6f2;--line:#dfe4da;--red:#c0392b;
@@ -66,7 +66,7 @@ textarea{min-height:170px;resize:vertical}
 </head>
 <body>
 <header>
-  <h1>Zápisník <span>požadavků</span></h1>
+  <h1>Sklad<span>Note</span> <small style="font:600 18px var(--body);text-transform:none;letter-spacing:0;color:#cfdccd">požadavky zákazníků</small></h1>
   <nav id="nav" class="hidden">
     <button class="btn on" data-v="novy">Nový požadavek</button>
     <button class="btn" data-v="seznam">Přehled</button>
@@ -78,7 +78,7 @@ textarea{min-height:170px;resize:vertical}
 <main>
   <!-- PŘIHLÁŠENÍ -->
   <section id="login" class="card">
-    <h2>Zápisník je pod heslem</h2>
+    <h2>SkladNote je pod heslem</h2>
     <p>Zadejte heslo skladu</p>
     <input type="password" id="heslo" autocomplete="off" placeholder="Heslo">
     <div class="row" style="justify-content:center"><button class="btn y" id="prihlasit">Pokračovat</button></div>
@@ -125,7 +125,7 @@ const store = { get:k=>{try{return sessionStorage.getItem(k)}catch(e){return nul
 const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 async function api(akce, extra = {}) {
-  if (!API) throw new Error("Zápisník zatím není propojený s Google Tabulkou.");
+  if (!API) throw new Error("SkladNote zatím není propojený s Google Tabulkou.");
   const r = await fetch(API, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" },
     body: JSON.stringify({ akce, heslo, ...extra }) });
   const j = await r.json();
@@ -215,7 +215,7 @@ $("#list").onclick = async e => {
 /* auto-přihlášení v rámci relace */
 const ulozene = store.get("fimasZapis");
 if (ulozene) login(ulozene); else $("#heslo").focus();
-if (!API) show($("#loginMsg"), "Zápisník zatím není propojený s Google Tabulkou (chybí adresa skriptu).", false);
+if (!API) show($("#loginMsg"), "SkladNote zatím není propojený s Google Tabulkou (chybí adresa skriptu).", false);
 </script>
 </body>
 </html>
