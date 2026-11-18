@@ -11,7 +11,7 @@
 # Uzavření prodejny a pneuservisu v pondělí 16. 11. 2026
 Vítejte 
 v našem novém 
-informačním systému FIMAS - Chytrý sklad v.1.0
+informačním systému FIMAS - Smart shop verze 1.0.26
 autor: Pavel Juráček
 # platí do: 30.11.2026
 # důležité: ano
