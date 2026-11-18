@@ -9,7 +9,9 @@
 #
 # Příklad:
 # Uzavření prodejny a pneuservisu v pondělí 16. 11. 2026
-Vítejte v novém informačním systému FIMAS, 
+Vítejte v našem novém 
+informačním systému FIMAS
 Chytrý sklad 1.0
+autor: Pavel Juráček
 # platí do: 30.11.2026
 # důležité: ano
