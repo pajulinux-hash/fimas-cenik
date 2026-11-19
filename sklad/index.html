@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="robots" content="noindex,nofollow">
+<meta name="author" content="Pavel Juráček">
+<meta name="generator" content="Smart shop 1.0.26">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FIMAS – smyčka sklad</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -132,6 +134,8 @@ body.msg.urgent #ticker b{background:#fff;color:#c0392b}
 #pfoot{display:flex;align-items:center;justify-content:center;gap:2vw;margin-top:2vh}
 #back{background:var(--ink);color:#fff;border:0;border-radius:1vh;padding:1.6vh 3vh;font:700 2.6vh var(--head);text-transform:uppercase;letter-spacing:.06em;cursor:pointer;border-bottom:.5vh solid var(--accent)}
 #idle{color:var(--steel);font-size:2vh}
+#ver{text-align:center;color:var(--steel);font-size:1.6vh;margin-top:1.2vh}
+#ver b{color:var(--ink)}
 
 /* PIN pro interní ceník */
 #pin{position:fixed;inset:0;background:rgba(22,48,26,.75);display:none;align-items:center;justify-content:center;z-index:9}
@@ -165,6 +169,7 @@ body.msg.urgent #ticker b{background:#fff;color:#c0392b}
   <div class="sub">Vyberte, co chcete otevřít. Zpět na předchozí stránku: <b>Alt + ←</b>. Po nečinnosti se obrazovka sama vrátí do prezentace.</div>
   <div id="tiles"></div>
   <div id="pfoot"><button id="back">◀ Zpět na prezentaci</button><div id="idle"></div></div>
+  <div id="ver"><b>Smart shop</b> verze 1.0.26 · autor: Pavel Juráček</div>
 </div>
 
 <div id="pin"><div class="box">
